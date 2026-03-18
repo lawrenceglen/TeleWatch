@@ -1,0 +1,11 @@
+# Copy this file to local.properties and fill in your values.
+# local.properties is gitignored and must NEVER be committed.
+
+# Telegram API credentials — get these from https://my.telegram.org
+TELEGRAM_APP_ID=YOUR_APP_ID_HERE
+TELEGRAM_APP_HASH=YOUR_APP_HASH_HERE
+
+# Release keystore — only needed for release builds
+RELEASE_STORE_PASSWORD=
+RELEASE_KEY_ALIAS=
+RELEASE_KEY_PASSWORD=

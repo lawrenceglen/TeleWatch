@@ -131,6 +131,8 @@ android {
             buildConfigField "boolean", "BUNDLE", "false"
             buildConfigField "boolean", "BUILD_HOST_IS_WINDOWS", isWindows
             buildConfigField "int", "VERSION_NUM", "0"
+            buildConfigField "int", "APP_ID", getProps("TELEGRAM_APP_ID") ?: "4"
+            buildConfigField "String", "APP_HASH", "\"" + (getProps("TELEGRAM_APP_HASH") ?: "014b35b6184100b085b0d0572f9b5103") + "\""
         }
 
         HA_private {
@@ -212,6 +214,8 @@ android {
             buildConfigField "boolean", "BUNDLE", "false"
             buildConfigField "boolean", "BUILD_HOST_IS_WINDOWS", isWindows
             buildConfigField "int", "VERSION_NUM", "7"
+            buildConfigField "int", "APP_ID", getProps("TELEGRAM_APP_ID") ?: "4"
+            buildConfigField "String", "APP_HASH", "\"" + (getProps("TELEGRAM_APP_HASH") ?: "014b35b6184100b085b0d0572f9b5103") + "\""
         }
     }
 
