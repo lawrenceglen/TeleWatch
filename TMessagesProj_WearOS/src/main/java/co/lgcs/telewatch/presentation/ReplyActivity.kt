@@ -1,4 +1,4 @@
-package org.telegram.wear.presentation
+package co.lgcs.telewatch.presentation
 
 import android.app.Activity
 import android.content.Intent

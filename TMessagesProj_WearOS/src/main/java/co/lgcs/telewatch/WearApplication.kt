@@ -1,4 +1,4 @@
-package org.telegram.wear
+package co.lgcs.telewatch
 
 import android.app.Application
 import org.telegram.messenger.ApplicationLoader

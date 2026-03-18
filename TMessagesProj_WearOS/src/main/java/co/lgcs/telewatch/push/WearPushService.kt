@@ -1,4 +1,4 @@
-package org.telegram.wear.push
+package co.lgcs.telewatch.push
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -9,8 +9,8 @@ import androidx.core.app.RemoteInput
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import org.telegram.messenger.GcmPushListenerService
-import org.telegram.wear.MainActivity
-import org.telegram.wear.presentation.ReplyActivity
+import co.lgcs.telewatch.MainActivity
+import co.lgcs.telewatch.presentation.ReplyActivity
 
 /**
  * Receives FCM pushes directly on the watch over LTE (standalone mode).

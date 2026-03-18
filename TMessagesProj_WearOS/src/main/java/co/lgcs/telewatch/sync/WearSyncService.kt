@@ -1,4 +1,4 @@
-package org.telegram.wear.sync
+package co.lgcs.telewatch.sync
 
 import android.app.Notification
 import android.app.NotificationChannel

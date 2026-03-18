@@ -1,4 +1,4 @@
-package org.telegram.wear
+package co.lgcs.telewatch
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -9,10 +9,10 @@ import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import org.telegram.messenger.UserConfig
-import org.telegram.wear.presentation.AuthScreen
-import org.telegram.wear.presentation.ChatListScreen
-import org.telegram.wear.presentation.MessageScreen
-import org.telegram.wear.presentation.theme.WearAppTheme
+import co.lgcs.telewatch.presentation.AuthScreen
+import co.lgcs.telewatch.presentation.ChatListScreen
+import co.lgcs.telewatch.presentation.MessageScreen
+import co.lgcs.telewatch.presentation.theme.WearAppTheme
 
 class MainActivity : ComponentActivity() {
 

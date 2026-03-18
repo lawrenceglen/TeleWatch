@@ -1,4 +1,4 @@
-package org.telegram.wear.presentation.theme
+package co.lgcs.telewatch.presentation.theme
 
 import androidx.compose.runtime.Composable
 import androidx.wear.compose.material.MaterialTheme

@@ -1,4 +1,4 @@
-package org.telegram.wear.presentation
+package co.lgcs.telewatch.presentation
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
@@ -10,7 +10,7 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import com.google.android.horologist.compose.layout.rememberResponsiveColumnState
 import org.telegram.tgnet.TLRPC
-import org.telegram.wear.data.WearMessagesRepository
+import co.lgcs.telewatch.data.WearMessagesRepository
 
 /**
  * Main chat list. Uses Horologist's ScalingLazyColumn which handles the round

@@ -9,10 +9,10 @@ repositories {
 android {
     compileSdkVersion 35
     buildToolsVersion '35.0.0'
-    namespace 'org.telegram.wear'
+    namespace 'co.lgcs.telewatch'
 
     defaultConfig {
-        applicationId "org.telegram.messenger.wear"
+        applicationId "co.lgcs.telewatch"
         minSdkVersion 30
         targetSdkVersion 35
         versionCode 1

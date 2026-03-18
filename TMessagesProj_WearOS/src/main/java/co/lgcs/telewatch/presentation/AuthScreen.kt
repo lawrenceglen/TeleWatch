@@ -1,4 +1,4 @@
-package org.telegram.wear.presentation
+package co.lgcs.telewatch.presentation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -9,8 +9,8 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.CircularProgressIndicator
 import androidx.wear.compose.material.Text
-import org.telegram.wear.data.AuthState
-import org.telegram.wear.data.WearAuthManager
+import co.lgcs.telewatch.data.AuthState
+import co.lgcs.telewatch.data.WearAuthManager
 
 /**
  * Displays a QR code for first-time login via the Telegram QR auth flow.

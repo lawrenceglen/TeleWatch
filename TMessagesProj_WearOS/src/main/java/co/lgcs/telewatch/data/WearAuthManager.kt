@@ -1,4 +1,4 @@
-package org.telegram.wear.data
+package co.lgcs.telewatch.data
 
 import android.graphics.Bitmap
 import kotlinx.coroutines.channels.awaitClose

@@ -1,4 +1,4 @@
-package org.telegram.wear.presentation
+package co.lgcs.telewatch.presentation
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,7 +14,7 @@ import androidx.wear.input.wearableExtender
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.rememberResponsiveColumnState
 import org.telegram.messenger.MessageObject
-import org.telegram.wear.data.WearMessagesRepository
+import co.lgcs.telewatch.data.WearMessagesRepository
 
 private const val REMOTE_INPUT_KEY = "reply_text"
 
