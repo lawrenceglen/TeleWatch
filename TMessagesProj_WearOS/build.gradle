@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'com.google.gms.google-services'
 
 repositories {
     mavenCentral()
@@ -77,4 +78,7 @@ dependencies {
 
     // Coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
+
+    // Firebase
+    implementation 'com.google.firebase:firebase-messaging:22.0.0'
 }
