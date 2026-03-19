@@ -44,15 +44,11 @@ fun MessageScreen(dialogId: Long, onBack: () -> Unit) {
     }
 
     val columnState = rememberResponsiveColumnState()
-
-    // Messages come from server newest-first; reverse so oldest is at top, newest at bottom
     val orderedMessages = remember(messages) { messages.reversed() }
 
-    // Scroll to bottom (reply button) whenever messages load or update
-    val itemCount = if (orderedMessages.isEmpty()) 2 else orderedMessages.size + 1
     LaunchedEffect(orderedMessages.size) {
         if (orderedMessages.isNotEmpty()) {
-            columnState.state.animateScrollToItem(itemCount - 1)
+            columnState.state.animateScrollToItem(orderedMessages.size)
         }
     }
 
@@ -61,29 +57,32 @@ fun MessageScreen(dialogId: Long, onBack: () -> Unit) {
         vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
         positionIndicator = { PositionIndicator(scalingLazyListState = columnState.state) }
     ) {
-        ScalingLazyColumn(columnState = columnState) {
-            if (orderedMessages.isEmpty()) {
-                item {
-                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
+        Box(modifier = Modifier.fillMaxSize()) {
+            ScalingLazyColumn(columnState = columnState) {
+                if (orderedMessages.isEmpty()) {
+                    item {
+                        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator()
+                        }
+                    }
+                } else {
+                    items(orderedMessages.size) { index ->
+                        MessageBubble(message = orderedMessages[index])
                     }
                 }
-            } else {
-                items(orderedMessages.size) { index ->
-                    MessageBubble(message = orderedMessages[index])
-                }
+                // Padding so the last message clears the overlaid reply button
+                item { Spacer(modifier = Modifier.height(48.dp)) }
             }
 
-            // Reply button always at the bottom
-            item {
-                Button(
-                    onClick = { launchSystemReply() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                ) {
-                    Text("Reply")
-                }
+            // Small reply button pinned to bottom center
+            Button(
+                onClick = { launchSystemReply() },
+                modifier = Modifier
+                    .fillMaxWidth(0.45f)
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 8.dp)
+            ) {
+                Text("Reply")
             }
         }
     }
@@ -104,13 +103,6 @@ private fun MessageBubble(message: MessageObject) {
             modifier = Modifier.fillMaxWidth(0.85f)
         ) {
             Column(modifier = Modifier.padding(8.dp)) {
-                if (!isOutgoing) {
-                    Text(
-                        text = message.messageOwner?.from_id?.toString() ?: "",
-                        style = MaterialTheme.typography.caption2,
-                        color = MaterialTheme.colors.primary
-                    )
-                }
                 Text(
                     text = message.messageText?.toString() ?: "",
                     style = MaterialTheme.typography.body2

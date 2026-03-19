@@ -17,13 +17,18 @@ class WearMessagesRepository {
     private val messagesController: MessagesController get() = MessagesController.getInstance(account)
     private val notificationCenter: NotificationCenter get() = NotificationCenter.getInstance(account)
 
+    private fun filteredDialogs(): List<TLRPC.Dialog> =
+        messagesController.allDialogs
+            .filter { it.id > 0 } // positive IDs = 1-on-1 user chats; negative = groups/channels
+            .sortedByDescending { it.last_message_date }
+
     fun dialogsFlow(): Flow<List<TLRPC.Dialog>> = callbackFlow {
         val observer = NotificationCenter.NotificationCenterDelegate { id, _, _ ->
             if (id == NotificationCenter.dialogsNeedReload ||
                 id == NotificationCenter.updateInterfaces ||
                 id == NotificationCenter.messagesDidLoad
             ) {
-                trySend(messagesController.allDialogs.toList())
+                trySend(filteredDialogs())
             }
         }
 
@@ -31,7 +36,7 @@ class WearMessagesRepository {
         notificationCenter.addObserver(observer, NotificationCenter.updateInterfaces)
         notificationCenter.addObserver(observer, NotificationCenter.messagesDidLoad)
 
-        trySend(messagesController.allDialogs.toList())
+        trySend(filteredDialogs())
         messagesController.loadDialogs(0, 0, 20, true)
 
         awaitClose {
@@ -43,19 +48,37 @@ class WearMessagesRepository {
 
     fun messagesFlow(dialogId: Long): Flow<List<MessageObject>> = callbackFlow {
         val classGuid = ConnectionsManager.generateClassGuid()
+        val currentMessages = mutableListOf<MessageObject>()
 
         val observer = NotificationCenter.NotificationCenterDelegate { id, _, args ->
-            if (id == NotificationCenter.messagesDidLoad) {
-                val loadedDialogId = args[0] as? Long ?: return@NotificationCenterDelegate
-                if (loadedDialogId == dialogId) {
-                    @Suppress("UNCHECKED_CAST")
-                    val messages = args[2] as? ArrayList<MessageObject> ?: ArrayList()
-                    trySend(messages)
+            when (id) {
+                NotificationCenter.messagesDidLoad -> {
+                    val loadedDialogId = args[0] as? Long ?: return@NotificationCenterDelegate
+                    if (loadedDialogId == dialogId) {
+                        @Suppress("UNCHECKED_CAST")
+                        val loaded = args[2] as? ArrayList<MessageObject> ?: ArrayList()
+                        currentMessages.clear()
+                        currentMessages.addAll(loaded)
+                        trySend(currentMessages.toList())
+                    }
+                }
+                NotificationCenter.didReceiveNewMessages -> {
+                    val newMsgDialogId = args[0] as? Long ?: return@NotificationCenterDelegate
+                    if (newMsgDialogId == dialogId) {
+                        val scheduled = args[2] as? Boolean ?: false
+                        if (!scheduled) {
+                            @Suppress("UNCHECKED_CAST")
+                            val newMessages = args[1] as? ArrayList<MessageObject> ?: ArrayList()
+                            currentMessages.addAll(0, newMessages) // prepend (server order: newest first)
+                            trySend(currentMessages.toList())
+                        }
+                    }
                 }
             }
         }
 
         notificationCenter.addObserver(observer, NotificationCenter.messagesDidLoad)
+        notificationCenter.addObserver(observer, NotificationCenter.didReceiveNewMessages)
 
         messagesController.loadMessages(
             dialogId, 0, false, 30, 0, 0, true,
@@ -64,6 +87,7 @@ class WearMessagesRepository {
 
         awaitClose {
             notificationCenter.removeObserver(observer, NotificationCenter.messagesDidLoad)
+            notificationCenter.removeObserver(observer, NotificationCenter.didReceiveNewMessages)
         }
     }
 
