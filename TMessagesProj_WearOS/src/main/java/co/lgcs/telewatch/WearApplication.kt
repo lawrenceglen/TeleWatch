@@ -8,13 +8,9 @@ import org.telegram.messenger.ApplicationLoader
  * We piggyback on ApplicationLoader which sets up everything needed by
  * MessagesController, ConnectionsManager, etc.
  */
-class WearApplication : Application() {
+class WearApplication : ApplicationLoader() {
 
     override fun onCreate() {
         super.onCreate()
-        // Delegate to the existing Telegram application bootstrap.
-        // This brings up MTProto connections, account instances, push, storage.
-        ApplicationLoader.applicationContext = this
-        ApplicationLoader.postInitApplication()
     }
 }

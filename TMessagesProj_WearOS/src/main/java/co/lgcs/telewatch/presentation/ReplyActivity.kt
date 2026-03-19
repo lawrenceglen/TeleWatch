@@ -25,7 +25,7 @@ class ReplyActivity : Activity() {
         val replyText = bundle?.getCharSequence("reply_text")?.toString()
 
         if (!replyText.isNullOrBlank()) {
-            org.telegram.wear.data.WearMessagesRepository().sendMessage(dialogId, replyText)
+            co.lgcs.telewatch.data.WearMessagesRepository().sendMessage(dialogId, replyText)
         }
 
         finish()

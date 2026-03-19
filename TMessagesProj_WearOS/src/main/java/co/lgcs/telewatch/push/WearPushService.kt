@@ -8,15 +8,10 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.RemoteInput
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import org.telegram.messenger.GcmPushListenerService
 import co.lgcs.telewatch.MainActivity
 import co.lgcs.telewatch.presentation.ReplyActivity
+import org.telegram.messenger.PushListenerController
 
-/**
- * Receives FCM pushes directly on the watch over LTE (standalone mode).
- * Delegates actual message handling to the Telegram core's GcmPushListenerService,
- * then posts a Wear OS notification with an inline reply action.
- */
 class WearPushService : FirebaseMessagingService() {
 
     companion object {
@@ -25,8 +20,12 @@ class WearPushService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
-        // Let the core handle MTProto-level sync triggered by the push
-        GcmPushListenerService.sendRegistrationToServer(message.from)
+        // Delegate to the core exactly as GcmPushListenerService does
+        PushListenerController.processRemoteMessage(
+            PushListenerController.PUSH_TYPE_FIREBASE,
+            message.data["p"],
+            message.sentTime
+        )
 
         val dialogId = message.data["dialog_id"]?.toLongOrNull() ?: return
         val senderName = message.data["sender"] ?: "Telegram"
@@ -36,8 +35,9 @@ class WearPushService : FirebaseMessagingService() {
     }
 
     override fun onNewToken(token: String) {
-        // Forward new FCM token to Telegram servers via the core
-        GcmPushListenerService.sendRegistrationToServer(token)
+        PushListenerController.sendRegistrationToServer(
+            PushListenerController.PUSH_TYPE_FIREBASE, token
+        )
     }
 
     private fun postNotification(dialogId: Long, sender: String, text: String) {
@@ -47,23 +47,21 @@ class WearPushService : FirebaseMessagingService() {
             NotificationChannel(CHANNEL_ID, "Messages", NotificationManager.IMPORTANCE_HIGH)
         )
 
-        // Open app on tap
         val openIntent = PendingIntent.getActivity(
             this, dialogId.toInt(),
-            Intent(this, MainActivity::class.java).apply {
-                putExtra("dialog_id", dialogId)
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            Intent(this, MainActivity::class.java).also { intent ->
+                intent.putExtra("dialog_id", dialogId)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Inline reply action — triggers system Wear OS input chooser
         val remoteInput = RemoteInput.Builder(REPLY_KEY).setLabel("Reply").build()
 
         val replyIntent = PendingIntent.getActivity(
             this, (dialogId + 1000).toInt(),
-            Intent(this, ReplyActivity::class.java).apply {
-                putExtra("dialog_id", dialogId)
+            Intent(this, ReplyActivity::class.java).also { intent ->
+                intent.putExtra("dialog_id", dialogId)
             },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
         )

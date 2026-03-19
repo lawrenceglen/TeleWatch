@@ -7,7 +7,7 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import org.telegram.messenger.ConnectionsManager
+import org.telegram.tgnet.ConnectionsManager
 import org.telegram.messenger.UserConfig
 
 /**

@@ -1,16 +1,16 @@
 package co.lgcs.telewatch.presentation
 
+import android.app.RemoteInput
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.wear.input.RemoteInputIntentHelper
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.core.app.RemoteInput
 import androidx.wear.compose.material.*
-import androidx.wear.input.RemoteInputIntentHelper
-import androidx.wear.input.wearableExtender
+import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.rememberResponsiveColumnState
 import org.telegram.messenger.MessageObject
@@ -18,17 +18,13 @@ import co.lgcs.telewatch.data.WearMessagesRepository
 
 private const val REMOTE_INPUT_KEY = "reply_text"
 
-/**
- * Shows messages in a single dialog and provides a reply button that triggers
- * the Wear OS system input chooser (emoji, voice dictation, keyboard, canned replies).
- * No custom input UI — system-first.
- */
+@OptIn(ExperimentalHorologistApi::class)
 @Composable
 fun MessageScreen(dialogId: Long, onBack: () -> Unit) {
     val repo = remember { WearMessagesRepository() }
     val messages by repo.messagesFlow(dialogId).collectAsState(initial = emptyList())
 
-    // System RemoteInput launcher — this opens the Wear OS input chooser
+    // Launches the Wear OS system input chooser (emoji, voice, keyboard, canned replies)
     val replyLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -42,14 +38,9 @@ fun MessageScreen(dialogId: Long, onBack: () -> Unit) {
     fun launchSystemReply() {
         val remoteInput = RemoteInput.Builder(REMOTE_INPUT_KEY)
             .setLabel("Reply")
-            .wearableExtender {
-                setEmojisAllowed(true)
-            }
             .build()
-
-        val intent = RemoteInputIntentHelper.createActionRemoteInputIntent().apply {
-            RemoteInputIntentHelper.putRemoteInputsExtra(this, listOf(remoteInput))
-        }
+        val intent = RemoteInputIntentHelper.createActionRemoteInputIntent()
+        RemoteInputIntentHelper.putRemoteInputsExtra(intent, listOf(remoteInput))
         replyLauncher.launch(intent)
     }
 
@@ -61,7 +52,6 @@ fun MessageScreen(dialogId: Long, onBack: () -> Unit) {
         positionIndicator = { PositionIndicator(scalingLazyListState = columnState.state) }
     ) {
         ScalingLazyColumn(columnState = columnState) {
-            // Reply button pinned at top
             item {
                 Button(
                     onClick = { launchSystemReply() },
@@ -105,7 +95,7 @@ private fun MessageBubble(message: MessageObject) {
             Column(modifier = Modifier.padding(8.dp)) {
                 if (!isOutgoing) {
                     Text(
-                        text = message.senderName ?: "",
+                        text = message.messageOwner?.from_id?.toString() ?: "",
                         style = MaterialTheme.typography.caption2,
                         color = MaterialTheme.colors.primary
                     )

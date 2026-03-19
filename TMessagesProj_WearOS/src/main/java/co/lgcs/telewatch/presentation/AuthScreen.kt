@@ -7,10 +7,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import androidx.wear.compose.material.CircularProgressIndicator
 import androidx.wear.compose.material.Text
 import co.lgcs.telewatch.data.AuthState
 import co.lgcs.telewatch.data.WearAuthManager
+import kotlin.math.sqrt
 
 /**
  * Displays a QR code for first-time login via the Telegram QR auth flow.
@@ -29,19 +31,26 @@ fun AuthScreen(onAuthenticated: () -> Unit) {
         }
     }
 
-    Box(
+    BoxWithConstraints(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
+        // Largest square that fits inside the circular screen, with padding
+        val qrSize = min(maxWidth, maxHeight) * (1f / sqrt(2f)) * 0.92f
+
         when (val state = authState) {
             null -> CircularProgressIndicator()
             is AuthState.ShowQr -> {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = "Scan with Telegram", modifier = Modifier.padding(bottom = 8.dp))
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Text(text = "Scan with Telegram", modifier = Modifier.padding(bottom = 4.dp))
                     Image(
                         bitmap = state.bitmap.asImageBitmap(),
                         contentDescription = "Login QR code",
-                        modifier = Modifier.size(180.dp)
+                        modifier = Modifier.size(qrSize)
                     )
                 }
             }

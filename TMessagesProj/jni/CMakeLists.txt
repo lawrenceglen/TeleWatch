@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10.2)
 
 set(CMAKE_CXX_FLAGS "-std=c++14 -DANDROID -g")
 set(CMAKE_C_FLAGS "-w -std=c11 -DANDROID -D_LARGEFILE_SOURCE=1 -g")
-set(CMAKE_ASM_FLAGS "${CFLAGS} -x assembler-with-cpp")
+set(CMAKE_ASM_FLAGS "${CFLAGS} -x assembler-with-cpp -fintegrated-as")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffunction-sections -fdata-sections")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--exclude-libs,libtgvoip.a,libtgcalls.a,libtgcalls_tp.a,libtgnet.a,libflac.a,librlottie.a,libsqlite.a,
@@ -263,20 +263,12 @@ target_include_directories(rlottie PUBLIC
         rlottie/src/vector/freetype
         rlottie/src/vector/stb)
 
+# NEON assembly skipped for both armeabi-v7a and arm64-v8a — uses C intrinsics fallback
+# to avoid macOS cross-assembler issues with pixman ARM NEON .S files.
+# Undefine __ARM_NEON__ for rlottie on armeabi-v7a so vdrawhelper_neon.cpp's #if guard
+# evaluates to false and doesn't reference the missing assembly symbols.
 if (${ANDROID_ABI} STREQUAL "armeabi-v7a")
-    target_compile_options(rlottie PUBLIC
-            -fno-integrated-as)
-    target_compile_definitions(rlottie PUBLIC
-            USE_ARM_NEON)
-    target_sources(rlottie PRIVATE
-            rlottie/src/vector/pixman/pixman-arm-neon-asm.S)
-elseif(${ANDROID_ABI} STREQUAL "arm64-v8a")
-    target_compile_options(rlottie PUBLIC
-            -fno-integrated-as)
-    target_compile_definitions(rlottie PUBLIC
-            USE_ARM_NEON __ARM64_NEON__)
-    target_sources(rlottie PRIVATE
-            rlottie/src/vector/pixman/pixman-arma64-neon-asm.S)
+    target_compile_options(rlottie PRIVATE -U__ARM_NEON__ -U__ARM64_NEON__)
 endif()
 
 

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-feature android:name="android.hardware.type.watch" />
 
@@ -17,11 +18,12 @@
 
     <application
         android:name=".WearApplication"
-        android:label="Telegram"
+        android:label="TeleWatch"
         android:icon="@drawable/ic_launcher"
         android:theme="@android:style/Theme.DeviceDefault"
         android:allowBackup="true"
-        android:supportsRtl="true">
+        android:supportsRtl="true"
+        tools:replace="android:name,android:theme,android:supportsRtl">
 
         <!-- Declare this is a standalone Wear OS app (no phone companion required) -->
         <meta-data
@@ -38,6 +40,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Remove alternate launcher icons inherited from the phone module -->
+        <activity-alias android:name="org.telegram.messenger.DefaultIcon" tools:node="remove" />
+        <activity-alias android:name="org.telegram.messenger.VintageIcon" tools:node="remove" />
+        <activity-alias android:name="org.telegram.messenger.AquaIcon" tools:node="remove" />
+        <activity-alias android:name="org.telegram.messenger.PremiumIcon" tools:node="remove" />
+        <activity-alias android:name="org.telegram.messenger.TurboIcon" tools:node="remove" />
+        <activity-alias android:name="org.telegram.messenger.NoxIcon" tools:node="remove" />
 
         <activity
             android:name=".presentation.ReplyActivity"

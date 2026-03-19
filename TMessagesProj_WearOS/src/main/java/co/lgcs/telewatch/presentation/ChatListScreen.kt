@@ -6,8 +6,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.*
+import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
-import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import com.google.android.horologist.compose.layout.rememberResponsiveColumnState
 import org.telegram.tgnet.TLRPC
 import co.lgcs.telewatch.data.WearMessagesRepository
@@ -16,6 +16,7 @@ import co.lgcs.telewatch.data.WearMessagesRepository
  * Main chat list. Uses Horologist's ScalingLazyColumn which handles the round
  * Wear OS screen edge fade and rotary scroll input automatically.
  */
+@OptIn(ExperimentalHorologistApi::class)
 @Composable
 fun ChatListScreen(onChatSelected: (Long) -> Unit) {
     val repo = remember { WearMessagesRepository() }
