@@ -24,7 +24,6 @@ fun MessageScreen(dialogId: Long, onBack: () -> Unit) {
     val repo = remember { WearMessagesRepository() }
     val messages by repo.messagesFlow(dialogId).collectAsState(initial = emptyList())
 
-    // Launches the Wear OS system input chooser (emoji, voice, keyboard, canned replies)
     val replyLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -46,12 +45,36 @@ fun MessageScreen(dialogId: Long, onBack: () -> Unit) {
 
     val columnState = rememberResponsiveColumnState()
 
+    // Messages come from server newest-first; reverse so oldest is at top, newest at bottom
+    val orderedMessages = remember(messages) { messages.reversed() }
+
+    // Scroll to bottom (reply button) whenever messages load or update
+    val itemCount = if (orderedMessages.isEmpty()) 2 else orderedMessages.size + 1
+    LaunchedEffect(orderedMessages.size) {
+        if (orderedMessages.isNotEmpty()) {
+            columnState.state.animateScrollToItem(itemCount - 1)
+        }
+    }
+
     Scaffold(
         timeText = { TimeText() },
         vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
         positionIndicator = { PositionIndicator(scalingLazyListState = columnState.state) }
     ) {
         ScalingLazyColumn(columnState = columnState) {
+            if (orderedMessages.isEmpty()) {
+                item {
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+            } else {
+                items(orderedMessages.size) { index ->
+                    MessageBubble(message = orderedMessages[index])
+                }
+            }
+
+            // Reply button always at the bottom
             item {
                 Button(
                     onClick = { launchSystemReply() },
@@ -60,18 +83,6 @@ fun MessageScreen(dialogId: Long, onBack: () -> Unit) {
                         .padding(horizontal = 16.dp)
                 ) {
                     Text("Reply")
-                }
-            }
-
-            if (messages.isEmpty()) {
-                item {
-                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
-                    }
-                }
-            } else {
-                items(messages.size) { index ->
-                    MessageBubble(message = messages[index])
                 }
             }
         }
